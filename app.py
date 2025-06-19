@@ -28,9 +28,9 @@ try:
     # The 'preauthorized' key is deprecated and has been removed.
     config = {
         'credentials': {
-            'usernames': copy.deepcopy(st.secrets['credentials']['usernames'])
+            'usernames': copy.deepcopy(st.secrets['credentials']['usernames'].to_dict())
         },
-        'cookie': copy.deepcopy(st.secrets['cookie']),
+        'cookie': copy.deepcopy(st.secrets['cookie'].to_dict()),
     }
     # --- CHANGE END ---
 except (KeyError, FileNotFoundError):
