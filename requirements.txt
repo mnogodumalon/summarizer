@@ -5,3 +5,4 @@ streamlit
 streamlit-authenticator
 PyYAML
 ffmpeg-python
+copy

@@ -11,6 +11,7 @@ import streamlit as st
 import streamlit_authenticator as stauth
 import yaml
 from yaml.loader import SafeLoader
+import copy
 
 # st.subheader("DEBUG: Inhalt von st.secrets")
 # st.write(st.secrets.to_dict())
@@ -27,9 +28,9 @@ try:
     # The 'preauthorized' key is deprecated and has been removed.
     config = {
         'credentials': {
-            'usernames': dict(st.secrets['credentials']['usernames'])
+            'usernames': copy.deepcopy(st.secrets['credentials']['usernames'])
         },
-        'cookie': dict(st.secrets['cookie']),
+        'cookie': copy.deepcopy(st.secrets['cookie']),
     }
     # --- CHANGE END ---
 except (KeyError, FileNotFoundError):
