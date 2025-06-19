@@ -18,14 +18,19 @@ from yaml.loader import SafeLoader
 # In Streamlit Cloud werden stattdessen die "Secrets" verwendet.
 try:
     api_key = st.secrets["OPENAI_API_KEY"]
-except KeyError:
+    # Die Authenticator-Konfiguration wird auch aus den Secrets geladen
+    config = st.secrets
+except (KeyError, FileNotFoundError):
+    # Lokaler Fallback
     try:
         load_dotenv()
         api_key = os.getenv("OPENAI_API_KEY")
         if not api_key:
             raise KeyError()
+        with open('config.yaml') as file:
+            config = yaml.load(file, Loader=SafeLoader)
     except Exception:
-        st.error("Fehler: Der OPENAI_API_KEY wurde weder in den Streamlit Secrets noch in einer .env-Datei gefunden.")
+        st.error("Fehler: Kritische Konfigurationen (API-Key oder Auth-Config) fehlen.")
         st.stop()
 
 # Initialisiere den OpenAI-Client mit dem geladenen API-Schlüssel.
@@ -269,26 +274,23 @@ def run_summarizer_app():
 
 
 def main():
-    """Steuert die Authentifizierung und startet die Hauptanwendung bei Erfolg."""
-    st.set_page_config(page_title="Chat Summarizer", layout="wide")
+    """Hauptfunktion, die die Streamlit-Anwendung startet."""
 
-    try:
-        with open('config.yaml') as file:
-            config = yaml.load(file, Loader=SafeLoader)
-    except FileNotFoundError:
-        st.error("Fehler: Die Konfigurationsdatei 'config.yaml' wurde nicht gefunden.")
-        st.stop()
+    # Setze das Seitenlayout auf "wide" für mehr Platz.
+    st.set_page_config(page_title="Chat Summarizer", layout="wide")
 
     authenticator = stauth.Authenticate(
         config['credentials'],
         config['cookie']['name'],
         config['cookie']['key'],
-        config['cookie']['expiry_days']
+        config['cookie']['expiry_days'],
+        config['preauthorized']
     )
 
+    # Starte den Authentifizierungsprozess.
     authenticator.login()
 
-    if st.session_state.get("authentication_status"):
+    if st.session_state["authentication_status"]:
         # Notwendig, um die Konfiguration zu speichern, falls das Passwort gehasht wurde
         with open('config.yaml', 'w') as file:
             yaml.dump(config, file, default_flow_style=False)
