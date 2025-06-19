@@ -11,6 +11,7 @@ import streamlit as st
 import streamlit_authenticator as stauth
 import yaml
 from yaml.loader import SafeLoader
+import copy
 
 # -- Konfiguration und Initialisierung --
 
@@ -19,7 +20,8 @@ from yaml.loader import SafeLoader
 try:
     api_key = st.secrets["OPENAI_API_KEY"]
     # Die Authenticator-Konfiguration wird auch aus den Secrets geladen
-    config = st.secrets
+    # WICHTIG: Erstelle eine tiefe Kopie, um das unveränderliche Secrets-Objekt in ein veränderliches dict umzuwandeln.
+    config = copy.deepcopy(st.secrets)
 except (KeyError, FileNotFoundError):
     # Lokaler Fallback
     try:
