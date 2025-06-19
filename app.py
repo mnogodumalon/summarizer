@@ -12,8 +12,8 @@ import streamlit_authenticator as stauth
 import yaml
 from yaml.loader import SafeLoader
 
-st.subheader("DEBUG: Inhalt von st.secrets")
-st.write(st.secrets.to_dict())
+# st.subheader("DEBUG: Inhalt von st.secrets")
+# st.write(st.secrets.to_dict())
 
 # -- Konfiguration und Initialisierung --
 
