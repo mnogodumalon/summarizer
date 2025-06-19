@@ -12,6 +12,9 @@ import streamlit_authenticator as stauth
 import yaml
 from yaml.loader import SafeLoader
 
+st.subheader("DEBUG: Inhalt von st.secrets")
+st.write(st.secrets.to_dict())
+
 # -- Konfiguration und Initialisierung --
 
 # Lade Umgebungsvariablen für den lokalen Betrieb.
@@ -20,13 +23,15 @@ try:
     api_key = st.secrets["OPENAI_API_KEY"]
     # Die Authenticator-Konfiguration wird auch aus den Secrets geladen
     # Manuelle Konvertierung von st.secrets in ein veränderliches dict, um TypeErrors zu vermeiden.
+    # --- CHANGE START ---
+    # The 'preauthorized' key is deprecated and has been removed.
     config = {
         'credentials': {
             'usernames': dict(st.secrets['credentials']['usernames'])
         },
         'cookie': dict(st.secrets['cookie']),
-        'preauthorized': dict(st.secrets['preauthorized'])
     }
+    # --- CHANGE END ---
 except (KeyError, FileNotFoundError):
     # Lokaler Fallback
     try:
@@ -285,20 +290,24 @@ def main():
 
     # Setze das Seitenlayout auf "wide" für mehr Platz.
     st.set_page_config(page_title="Chat Summarizer", layout="wide")
-
+    
+    # --- CHANGE START ---
+    # The 'preauthorized' parameter is deprecated and must be removed from the call.
     authenticator = stauth.Authenticate(
         config['credentials'],
         config['cookie']['name'],
         config['cookie']['key'],
-        config['cookie']['expiry_days'],
-        config['preauthorized']
+        config['cookie']['expiry_days']
     )
+    # --- CHANGE END ---
 
     # Starte den Authentifizierungsprozess.
     authenticator.login()
 
     if st.session_state["authentication_status"]:
         # Notwendig, um die Konfiguration zu speichern, falls das Passwort gehasht wurde
+        # If 'preauthorized' existed in the original yaml, it will not be written back,
+        # effectively cleaning the file on the first successful login.
         with open('config.yaml', 'w') as file:
             yaml.dump(config, file, default_flow_style=False)
         
@@ -312,4 +321,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main() 
+    main()
