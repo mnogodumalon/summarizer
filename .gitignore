@@ -1,0 +1,27 @@
+# Ignore virtualenv folder
+.venv/
+venv/
+ENV/
+
+# Ignore Python cache
+__pycache__/
+*.py[cod]
+*.class
+
+# Ignore generated files
+*.log
+*.pot
+
+# Ignore user-uploaded data
+extracted_chat/
+*.zip
+
+# Ignore environment variables
+.env
+.env*
+
+# Ignore Streamlit secrets
+.streamlit/secrets.toml
+
+# Ignore config files with sensitive data
+config.yaml
